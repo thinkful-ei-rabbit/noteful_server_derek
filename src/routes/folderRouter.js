@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const xss = require('xss');
-const FolderService = require('../../src/services/folder_service');
+const FolderServices = require('../services/folderServices');
 
 const folderRouter = express.Router();
 const serializefolder = (folder) => ({
@@ -13,7 +13,7 @@ folderRouter
   .route('/')
   .get((req, res, next) => {
     const knexInstance = req.app.get('db');
-    FolderService.getAllfolders(knexInstance)
+    FolderServices.getAllfolders(knexInstance)
       .then((folders) => {
         res.json(folders.map(serializefolder));
       })
@@ -29,7 +29,7 @@ folderRouter
       });
     }
 
-    FolderService.insertFolder(req.app.get('db'), newFolder)
+    return FolderServices.insertFolder(req.app.get('db'), newFolder)
       .then((folder) => {
         res
           .status(201)
@@ -42,7 +42,7 @@ folderRouter
 folderRouter
   .route('/:folder_id')
   .all((req, res, next) => {
-    FolderService.getById(req.app.get('db'), req.params.folder_id)
+    FolderServices.getById(req.app.get('db'), req.params.folder_id)
       .then((folder) => {
         if (!folder) {
           return res.status(404).json({
@@ -50,7 +50,7 @@ folderRouter
           });
         }
         res.folder = folder;
-        next();
+        return next();
       })
       .catch(next);
   })
@@ -58,7 +58,7 @@ folderRouter
     res.json(serializefolder(res.folder));
   })
   .delete((req, res, next) => {
-    FolderService.deleteById(req.app.get('db'), req.params.folder_id)
+    FolderServices.deleteById(req.app.get('db'), req.params.folder_id)
       .then(() => {
         res.status(204).end();
       })
@@ -72,11 +72,11 @@ folderRouter
     if (numberOfValues === 0)
       return res.status(400).json({
         error: {
-          message: `Request body must contain 'folder_name'.`
+          message: `Request body must contain either 'folder_name'.`
         }
       });
 
-    FolderService.updateById(req.app.get('db'), req.params.folder_id, newFolder)
+    return FolderServices.updateById(req.app.get('db'), req.params.folder_id, newFolder)
       .then(() => {
         res.status(204).end();
       })

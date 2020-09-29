@@ -7,8 +7,8 @@ const helmet = require('helmet');
 const { NODE_ENV, CORS_ORIGIN } = require('../../src/config/envConfig');
 
 const errors = require('../../src/middlewares/errors');
-const noteRouter = require('../routes/note-router');
-const folderRouter = require('../routes/folder-router');
+const noteRouter = require('../routes/noteRouter');
+const folderRouter = require('../routes/folderRouter');
 
 const morganOption = NODE_ENV === 'production' ? 'tiny' : 'dev';
 

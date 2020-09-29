@@ -1,8 +1,7 @@
 require('dotenv').config();
-const path = require('path')
 
 module.exports = {
-  migrationsDirectory: path.resolve(__dirname,'migrations'),
+  migrationDirectory: __dirname + '/db/migrations',
   driver: 'pg',
   connectionString:
     process.env.NODE_ENV === 'test'

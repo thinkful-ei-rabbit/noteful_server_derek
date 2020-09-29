@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const xss = require('xss');
-const NoteService = require('../services/note-service');
+const NoteServices = require('../services/noteServices');
 
 const noteRouter = express.Router();
 const serializeNote = (note) => ({
@@ -16,7 +16,7 @@ noteRouter
   .route('/')
   .get((req, res, next) => {
     const knexInstance = req.app.get('db');
-    NoteService.getAllNotes(knexInstance)
+    NoteServices.getAllNotes(knexInstance)
       .then((notes) => {
         res.json(notes.map(serializeNote));
       })
@@ -35,7 +35,7 @@ noteRouter
       }
     }
 
-    NoteService.insertNote(req.app.get('db'), newNote)
+    return NoteServices.insertNote(req.app.get('db'), newNote)
       .then((note) => {
         res
           .status(201)
@@ -48,7 +48,7 @@ noteRouter
 noteRouter
   .route('/:note_id')
   .all((req, res, next) => {
-    NoteService.getById(req.app.get('db'), req.params.note_id)
+    NoteServices.getById(req.app.get('db'), req.params.note_id)
       .then((note) => {
         if (!note) {
           return res.status(404).json({
@@ -56,7 +56,7 @@ noteRouter
           });
         }
         res.note = note;
-        next();
+        return next();
       })
       .catch(next);
   })
@@ -64,7 +64,7 @@ noteRouter
     res.json(serializeNote(res.note));
   })
   .delete((req, res, next) => {
-    NoteService.deleteById(req.app.get('db'), req.params.note_id)
+    NoteServices.deleteById(req.app.get('db'), req.params.note_id)
       .then(() => {
         res.status(204).end();
       })
@@ -82,7 +82,7 @@ noteRouter
         }
       });
 
-    NoteService.updateById(req.app.get('db'), req.params.note_id, newNote)
+    return NoteServices.updateById(req.app.get('db'), req.params.note_id, newNote)
       .then(() => {
         res.status(204).end();
       })
