@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 
-const { NODE_ENV, CORS_ORIGIN } = require('../../src/config/envConfig');
+const { NODE_ENV } = require('../../src/config/envConfig');
 
 const errors = require('../../src/middlewares/errors');
 const noteRouter = require('../routes/noteRouter');
@@ -15,11 +15,7 @@ const morganOption = NODE_ENV === 'production' ? 'tiny' : 'dev';
 const app = express();
 app.use(morgan(morganOption));
 app.use(helmet());
-app.use(
-  cors({
-    origin: CORS_ORIGIN
-  })
-);
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
